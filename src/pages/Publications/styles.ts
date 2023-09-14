@@ -25,8 +25,10 @@ export const PublicationsContainer = styled.div`
   width: 54rem;
   max-width: 1140px;
   margin: 0 auto;
-  
 `;
+
+export const SearchFormContainer = styled.form`
+`
 
 export const PublicationsSearch = styled.input`
   display: flex;
@@ -39,10 +41,11 @@ export const PublicationsSearch = styled.input`
   background: var(--base-input, #040F1A);
   margin-top: 0.75rem;
   margin-bottom: 3rem;
+  color: ${props => props.theme['white']};
 `
 export const ContentContainer = styled.div `
   background-color: ${props => props.theme['base-background']};
-  width: 90rem;
+  width: 100vw;
   min-height: calc(100vh - 18.5rem);
   margin: 0 auto;
 `

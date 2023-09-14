@@ -1,6 +1,7 @@
+import "./index.css"
 import { useEffect, useState } from "react";
 // import { PostInfoCard } from "../../components/PostInfoCard";
-import { formatDistanceToNow, parseISO } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { ContentContainer } from "../Publications/styles";
@@ -10,6 +11,7 @@ import api from "../../services/api";
 import { BoxContainer, BoxTopContainer, ContainerFlexCol, MoreInfoContainer, ProfileCard, Title } from "../../components/PostInfoCard/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowUpRightFromSquare, faCalendarDay, faComment } from "@fortawesome/free-solid-svg-icons";
+import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 
 export function Post() {
   const { id } = useParams();
@@ -38,11 +40,15 @@ export function Post() {
         console.error("Ocorreu um erro - " + err)
       })
   }, []);
-
-  const publishedDateRelativeToNow = formatDistanceToNow(parseISO(issue.created_at.trim()), {
+  
+  const publishedDateRelativeToNow = formatDistanceToNow(convertStringInDate(issue.created_at), {
     locale: ptBR,
     addSuffix: true
   })
+
+  function convertStringInDate(str: string){
+    return str.length ? Date.parse(str) : new Date();
+  }
   
   return (
 // 33561420230801406542
@@ -86,7 +92,10 @@ export function Post() {
       </ProfileCard>
         <TextContainer>
         <p>
-          {issue.body}
+          <ReactMarkdown 
+          >
+            {issue.body} 
+          </ReactMarkdown>
         </p>
         </TextContainer>
       </PostContainer>

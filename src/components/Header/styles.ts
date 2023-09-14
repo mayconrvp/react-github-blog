@@ -7,7 +7,7 @@ export interface HeaderProps {
 
 export const HeaderContainer = styled.header`
   background-color: ${props => props.theme['base-profile']};
-  width: 90rem ;
+  width: 100vw;
   height: 18.5rem;
   margin: 0 auto;
 
