@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import { Card } from "../../components/Card";
 import { Profile } from "../../components/Profile";
-import { CardsOfPublications, ContentContainer, PublicationsContainer, PublicationsSearch, TopContainer } from "./styles";
+import { CardsOfPublications, ContentContainer, PublicationsContainer, PublicationsSearch, SearchFormContainer, TopContainer } from "./styles";
 import api from "../../services/api";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import * as z from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const searchFormSchema = z.object({
+  query: z.string()
+})
+
+type SearchFormInputs = z.infer<typeof searchFormSchema>
 
 export function Publications() {
   const [user, setUser] = useState({
@@ -14,8 +23,30 @@ export function Publications() {
     login: ''
   });
 
+  const { register, handleSubmit } = useForm<SearchFormInputs>({
+    resolver: zodResolver(searchFormSchema)
+  })
+
+  function handleSearchPublications(data: SearchFormInputs){
+    fetchIssues(data.query)
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [issues, setIssues] = useState<any[]>([]);
+
+  async function fetchIssues(query?: string) {
+    console.log("FETCH, QUERY", query)
+
+    await api
+      .get(`search/issues?q=${query? query : ''}+repo:mayconrvp/react-github-blog`)
+      .then((response) => {
+        setIssues(response.data.items)
+        console.log(response.data.items)
+      })
+      .catch((err) => {
+        console.error("Ocorreu um erro - " + err)
+      })
+  }
 
   useEffect(() => {
     api
@@ -30,15 +61,7 @@ export function Publications() {
   }, []);
 
   useEffect(() => {
-    api
-      .get("search/issues?q=+repo:mayconrvp/react-github-blog")
-      .then((response) => {
-        setIssues(response.data.items)
-        console.log(response.data.items)
-      })
-      .catch((err) => {
-        console.error("Ocorreu um erro - " + err)
-      })
+    fetchIssues()
   }, []);
 
   return (
@@ -59,7 +82,13 @@ export function Publications() {
             {issues.length} publicações
           </span>
         </TopContainer>
-        <PublicationsSearch placeholder="Buscar conteúdo" type="text" name="" id="" />
+        <SearchFormContainer onSubmit={handleSubmit(handleSearchPublications)}>
+          <PublicationsSearch 
+            placeholder="Buscar conteúdo" 
+            type="text"             
+            {...register('query')}
+          />
+        </SearchFormContainer>
         <CardsOfPublications className="cards">
           {
             issues.map(el => {
